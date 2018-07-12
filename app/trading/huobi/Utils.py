@@ -14,22 +14,29 @@ import urllib
 import urllib.parse
 import urllib.request
 import requests
+from ecdsa import SigningKey
+from hashlib import sha256
 
 # 此处填写APIKEY
 
-ACCESS_KEY = ''
-SECRET_KEY = ''
+ACCESS_KEY = ""
+SECRET_KEY = ""
 
+# Need to replace with the actual value generated from below command
+# openssl ecparam -name secp256k1 -genkey -noout -out secp256k1-key.pem
+PRIVATE_KEY = '''-----BEGIN EC PRIVATE KEY-----
 
+    -----END EC PRIVATE KEY-----'''
 
-# API 请求地址
+# API request URL
 MARKET_URL = "https://api.huobi.pro"
 TRADE_URL = "https://api.huobi.pro"
 
-# 首次运行可通过get_accounts()获取acct_id,然后直接赋值,减少重复获取。
+# Can first request to call get_accounts()to find the target acct_id,later can just specify the actual acc_id in the api call
 ACCOUNT_ID = None
 
-#'Timestamp': '2017-06-02T06:13:49'
+
+# 'Timestamp': '2017-06-02T06:13:49'
 
 def http_get_request(url, params, add_to_headers=None):
     headers = {
@@ -39,16 +46,16 @@ def http_get_request(url, params, add_to_headers=None):
     if add_to_headers:
         headers.update(add_to_headers)
     postdata = urllib.parse.urlencode(params)
-
+    proxies = {"http": "http://10.8.42.143:1080", "https": "http://10.8.42.143:1080", }
+    response = requests.get(url, postdata, headers=headers, timeout=5, proxies=proxies)
     try:
-        response = requests.get(url, postdata, headers=headers, timeout=5)
 
         if response.status_code == 200:
             return response.json()
         else:
             return
     except BaseException as e:
-        print("httpGet failed, detail is:%s,%s" %(response.text,e))
+        print("httpGet failed, detail is:%s,%s" % (response.text, e))
         return
 
 
@@ -60,15 +67,15 @@ def http_post_request(url, params, add_to_headers=None):
     if add_to_headers:
         headers.update(add_to_headers)
     postdata = json.dumps(params)
-
+    response = requests.post(url, postdata, headers=headers, timeout=10)
     try:
-        response = requests.post(url, postdata, headers=headers, timeout=10)
+
         if response.status_code == 200:
             return response.json()
         else:
             return
     except BaseException as e:
-        print("httpPost failed, detail is:%s,%s" %(response.text,e))
+        print("httpPost failed, detail is:%s,%s" % (response.text, e))
         return
 
 
@@ -83,8 +90,9 @@ def api_key_get(params, request_path):
     host_url = TRADE_URL
     host_name = urllib.parse.urlparse(host_url).hostname
     host_name = host_name.lower()
-    params['Signature'] = createSign(params, method, host_name, request_path, SECRET_KEY)
-
+    signature = createSign(params, method, host_name, request_path, SECRET_KEY)
+    params['Signature'] = signature
+    params['PrivateSignature'] = createPrivateSignature(signature, PRIVATE_KEY)
     url = host_url + request_path
     return http_get_request(url, params)
 
@@ -100,7 +108,9 @@ def api_key_post(params, request_path):
     host_url = TRADE_URL
     host_name = urllib.parse.urlparse(host_url).hostname
     host_name = host_name.lower()
-    params_to_sign['Signature'] = createSign(params_to_sign, method, host_name, request_path, SECRET_KEY)
+    signature = createSign(params_to_sign, method, host_name, request_path, SECRET_KEY)
+    params_to_sign['Signature'] = signature
+    params_to_sign['PrivateSignature'] = createPrivateSignature(signature, PRIVATE_KEY)
     url = host_url + request_path + '?' + urllib.parse.urlencode(params_to_sign)
     return http_post_request(url, params)
 
@@ -118,3 +128,8 @@ def createSign(pParams, method, host_url, request_path, secret_key):
     signature = signature.decode()
     return signature
 
+
+def createPrivateSignature(signature, private_key):
+    signingKey = SigningKey.from_pem(private_key, hashfunc=sha256)
+    privateSignature = signingKey.sign(signature.encode(encoding='UTF8'))
+    return base64.b64encode(privateSignature)
