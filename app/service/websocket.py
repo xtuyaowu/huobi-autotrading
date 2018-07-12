@@ -53,7 +53,7 @@ def on_message(ws, message):
         else:
             save_data(msg_dict)
             logger.debug("收到消息: " + str(msg_dict))
-            # kline_handler.handle_raw_message(msg_dict)
+            kline_handler.handle_raw_message(msg_dict)
     except Exception as e:
         print('on_message')
         exstr = traceback.format_exc()
