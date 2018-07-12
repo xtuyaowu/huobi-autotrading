@@ -139,7 +139,7 @@ def update_data(channel):
 
 
 def handle_raw_message(msg_dict):
-    channel = msg_dict['ch']
+    channel = msg_dict.get('ch')
     if len(transaction_dict) == len(settings.COINS):
         total = 0
         for key, value in settings.ORIGINAL_COINS.items():

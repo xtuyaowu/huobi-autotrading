@@ -73,6 +73,10 @@ COINS = {
     "OMG": {
         "WEIGHT": 1,
         "AMOUNT": 0
+    },
+    "PAI": {
+        "WEIGHT": 1,
+        "AMOUNT": 0
     }
 }
 
@@ -85,10 +89,10 @@ ORIGINAL_COINS = deepcopy(COINS)
 ORIGINAL_WEALTH = None
 
 # 将从火币上获取到的交易信息保存到数据库(mongodb)
-DATABASE_RECORD = False
+DATABASE_RECORD = True
 
 # 配置以下项目以初始化数据库
-DATABASE_SERVER_ADDRESS = None
+DATABASE_SERVER_ADDRESS = "127.0.0.1"
 DATABASE_SERVER_PORT = 27017
 DATABASE_NAME = "huobi_exchange"
 
