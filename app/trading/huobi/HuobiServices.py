@@ -431,4 +431,9 @@ def margin_balance(symbol):
 
 
 if __name__ == '__main__':
-    print(get_symbols())
+    # print(get_symbols())
+    # print(get_accounts())
+    # print(get_balance(2769564))
+    # print(get_detail("paieth"))
+    print(send_order(130, "", "paieth", "sell-market", price=0))
+    # _type:buy - market：市价买, sell - market：市价卖

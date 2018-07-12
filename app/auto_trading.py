@@ -9,11 +9,15 @@ from app.trading.huobi.HuobiServices import get_balance, send_order, cancel_orde
 
 # 等待买入的币种(小写)
 COIN1 = 'ela'
-# 你想买进的COIN1的数量
+# 你想买进的 COIN1 的数量
 COIN1_AMOUNT = 10
-# 当COIN1的价格小于这个价位，程序允许买入，单位为COIN2
+# 你想卖出的 COIN1 的数量
+COIN1_SELL_AMOUNT = 10
+# 当 COIN1 的价格小于这个价位，程序允许买入，单位为 COIN2
 COIN1_PRICE = 0.00153
-# 用来支付的币种，在USDT/BTC/ETH中间选择
+# 当 COIN1 的价格大于这个价位，程序允许卖出，单位为 COIN2
+COIN1_SELL_PRICE = 0.00200
+# 用来支付的币种，在 USDT/BTC/ETH 中间选择
 COIN2 = 'btc'
 
 
@@ -45,12 +49,23 @@ def buy_limit(coin1, coin2, coin1_max_price, coin1_amount):
         resp_dict = send_order(amount=str(coin1_amount),
                                source='',
                                symbol=coin1 + coin2,
-                               _type='buy-limit',
-                               price=coin1_price)
+                               _type='buy-limit'
+                               )
         return resp_dict
     else:
         return {'status': 'err'}
 
+def sell_limit(coin1, coin2, coin1_sell_price, coin1_sell_amount):
+    coin1_price = get_price(coin1 + coin2)
+    if coin1_sell_price < float(coin1_price):
+        resp_dict = send_order(amount=str(coin1_sell_amount),
+                               source='',
+                               symbol=coin1 + coin2,
+                               _type='sell-market'
+                               )
+        return resp_dict
+    else:
+        return {'status': 'err'}
 
 def task():
     print('任务说明>> 我想用 {} 来买 {} '.format(COIN2, COIN1))
@@ -67,7 +82,20 @@ def task():
                 print('订单追踪>> 已经买入，任务完成')
                 break
         else:
-            print('当前进度>> 暂未上币，或价格不符...')
+            print('当前进度>> 暂未买入，或价格不符...')
+
+        resp_dict = buy_limit(COIN1, COIN2, COIN1_SELL_PRICE, COIN1_SELL_AMOUNT)
+        if 'data' in resp_dict:
+            order_id = resp_dict['data']
+            print('当前进度>> 已下卖单,订单ID为 {}'.format(order_id))
+            if order_matchresults(order_id)['status'] != 'ok':
+                print('订单追踪>> 未买到，取消订单...')
+                cancel_order(order_id)
+            else:
+                print('订单追踪>> 已经卖出，任务完成')
+                break
+        else:
+            print('当前进度>> 暂未卖出，或价格不符...')
 
 
 if __name__ == '__main__':
