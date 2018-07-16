@@ -88,7 +88,8 @@ def httpRequest(url, params):
 
     postdata = urllib.parse.urlencode(params)
     # postdata = postdata.encode('utf-8')
-    response = requests.post(url, postdata, headers=headers, timeout=5)
+    proxies = {"http": "http://10.8.42.143:1080", "https": "http://10.8.42.143:1080", }
+    response = requests.post(url, postdata, headers=headers, proxies=proxies, timeout=5)
     time.sleep(0.2)
     if response.status_code == 200:
         return response.json()

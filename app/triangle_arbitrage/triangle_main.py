@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import app.triangle_arbitrage.marketHelper
 # 设定账户 accountConfig
 import traceback
 import time
@@ -9,6 +8,8 @@ import logging
 # import yaml
 import multiprocessing
 import math
+
+from app.triangle_arbitrage import marketHelper
 from app.triangle_arbitrage.utils.helper import *
 
 # 设置logging
@@ -81,22 +82,32 @@ class Triangle:
             self.market_price_tick = dict()
             self.market_price_tick["{0}_{1}".format(self.base_cur, self.quote_cur)] = \
                 huobi_market.market_detail(self.base_cur, self.quote_cur)
+
+            # todo 做一下注释，我来解决技术问题
             market_price_sell_1 = \
                 self.market_price_tick["{0}_{1}".format(self.base_cur, self.quote_cur)].get("asks")[0][0]
+
             market_price_buy_1 = \
                 self.market_price_tick["{0}_{1}".format(self.base_cur, self.quote_cur)].get("bids")[0][0]
+
             self.market_price_tick["{0}_{1}".format(self.base_cur, self.mid_cur)] = \
                 huobi_market.market_detail(self.base_cur, self.mid_cur)
+
             base_mid_price_buy_1 = \
                 self.market_price_tick["{0}_{1}".format(self.base_cur, self.mid_cur)].get("bids")[0][0]
+
             base_mid_price_sell_1 = \
                 self.market_price_tick["{0}_{1}".format(self.base_cur, self.mid_cur)].get("asks")[0][0]
+
             self.market_price_tick["{0}_{1}".format(self.quote_cur, self.mid_cur)] = \
                 huobi_market.market_detail(self.quote_cur, self.mid_cur)
+
             quote_mid_price_sell_1 = \
                 self.market_price_tick["{0}_{1}".format(self.quote_cur, self.mid_cur)].get("asks")[0][0]
+
             quote_mid_price_buy_1 = \
                 self.market_price_tick["{0}_{1}".format(self.quote_cur, self.mid_cur)].get("bids")[0][0]
+
             # 检查正循环套利
             '''
                 三角套利的基本思路是，用两个市场（比如BTC/CNY，LTC/CNY）的价格（分别记为P1，P2），
@@ -139,7 +150,9 @@ class Triangle:
                     self.neg_cycle(huobi_market, market_sell_size)
                 else:
                     logger.info("小于最小交易单位")
-        except:
+        except Exception as e:
+            exstr = traceback.format_exc()
+            print(exstr)
             logger.error(traceback.format_exc())
 
     def sum_slippage_fee(self):

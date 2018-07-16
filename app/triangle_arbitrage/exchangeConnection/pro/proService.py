@@ -5,9 +5,8 @@ import time
 import hashlib
 from urllib.parse import quote
 
-from exchangeConnection.pro import token_api
-from exchangeConnection.pro import key_api
-import accountConfig
+from app.triangle_arbitrage import accountConfig
+from app.triangle_arbitrage.exchangeConnection.pro import token_api, key_api
 
 TOKEN_UPDATE_TIME = 600  # 提前此时间更新token
 
