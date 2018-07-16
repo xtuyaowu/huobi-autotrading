@@ -7,7 +7,7 @@ import http.client
 import statistics
 
 from app import settings
-from app.service import ma
+from app.huobi_data import ma
 from collections import deque
 
 ###

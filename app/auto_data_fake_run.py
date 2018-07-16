@@ -1,7 +1,7 @@
 import logging
 from app import settings
-from app.service import kline_handler
-from app.service import mongodb
+from app.huobi_data import kline_handler
+from app.huobi_data import mongodb
 
 logger = logging.getLogger(__name__)
 

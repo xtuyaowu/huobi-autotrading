@@ -4,7 +4,7 @@
 import sys
 import json
 import requests
-from app.trading.huobi.HuobiServices import get_balance, send_order, cancel_order, order_matchresults
+from app.huobi_trading.huobi.HuobiServices import get_balance, send_order, cancel_order, order_matchresults
 
 
 # 等待买入的币种(小写)

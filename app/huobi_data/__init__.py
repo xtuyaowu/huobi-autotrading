@@ -1,6 +1,6 @@
 from app import settings
 from pymongo import MongoClient
-from app.service.mailagent import MailAgent
+from app.huobi_data.mailagent import MailAgent
 
 mongodb = None
 ma = None
