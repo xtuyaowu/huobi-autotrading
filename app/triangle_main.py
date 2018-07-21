@@ -80,63 +80,65 @@ class Triangle:
             # 初始化为火币市场
             huobi_market = marketHelper.Market()
             self.market_price_tick = dict()
+            base_cur_list = ["bch","eth","ltc","etc","eos","ada","xrp","omg","steem","dash","iota",'ht','ont']
+            for base_cur in base_cur_list:
+                self.base_cur = base_cur
+                # p3 ltc / btc
+                self.market_price_tick["{0}_{1}".format(self.base_cur, self.quote_cur)] = huobi_market.market_detail(self.base_cur, self.quote_cur)
+                market_price_sell_1 = self.market_price_tick["{0}_{1}".format(self.base_cur, self.quote_cur)].get("asks")[0][0]
+                market_price_buy_1 = self.market_price_tick["{0}_{1}".format(self.base_cur, self.quote_cur)].get("bids")[0][0]
 
-            # p3 ltc / btc
-            self.market_price_tick["{0}_{1}".format(self.base_cur, self.quote_cur)] = huobi_market.market_detail(self.base_cur, self.quote_cur)
-            market_price_sell_1 = self.market_price_tick["{0}_{1}".format(self.base_cur, self.quote_cur)].get("asks")[0][0]
-            market_price_buy_1 = self.market_price_tick["{0}_{1}".format(self.base_cur, self.quote_cur)].get("bids")[0][0]
+                # p2 ltc / cny
+                self.market_price_tick["{0}_{1}".format(self.base_cur, self.mid_cur)] = huobi_market.market_detail(self.base_cur, self.mid_cur)
+                base_mid_price_buy_1 = self.market_price_tick["{0}_{1}".format(self.base_cur, self.mid_cur)].get("bids")[0][0]
+                base_mid_price_sell_1 = self.market_price_tick["{0}_{1}".format(self.base_cur, self.mid_cur)].get("asks")[0][0]
 
-            # p2 ltc / cny
-            self.market_price_tick["{0}_{1}".format(self.base_cur, self.mid_cur)] = huobi_market.market_detail(self.base_cur, self.mid_cur)
-            base_mid_price_buy_1 = self.market_price_tick["{0}_{1}".format(self.base_cur, self.mid_cur)].get("bids")[0][0]
-            base_mid_price_sell_1 = self.market_price_tick["{0}_{1}".format(self.base_cur, self.mid_cur)].get("asks")[0][0]
+                # p1 btc / cny
+                self.market_price_tick["{0}_{1}".format(self.quote_cur, self.mid_cur)] = huobi_market.market_detail(self.quote_cur, self.mid_cur)
+                quote_mid_price_sell_1 = self.market_price_tick["{0}_{1}".format(self.quote_cur, self.mid_cur)].get("asks")[0][0]
+                quote_mid_price_buy_1 = self.market_price_tick["{0}_{1}".format(self.quote_cur, self.mid_cur)].get("bids")[0][0]
 
-            # p1 btc / cny
-            self.market_price_tick["{0}_{1}".format(self.quote_cur, self.mid_cur)] = huobi_market.market_detail(self.quote_cur, self.mid_cur)
-            quote_mid_price_sell_1 = self.market_price_tick["{0}_{1}".format(self.quote_cur, self.mid_cur)].get("asks")[0][0]
-            quote_mid_price_buy_1 = self.market_price_tick["{0}_{1}".format(self.quote_cur, self.mid_cur)].get("bids")[0][0]
+                # 检查正循环套利
+                '''
+                    三角套利的基本思路是，用两个市场（比如BTC/CNY，LTC/CNY）的价格（分别记为P1，P2），
+                    计算出一个公允的LTC/BTC价格（P2/P1），如果该公允价格跟实际的LTC/BTC市场价格（记为P3）不一致，
+                    就产生了套利机会
+                    
+                    对应的套利条件就是：
+                    ltc_cny_buy_1_price >
+                    btc_cny_sell_1_price*ltc_btc_sell_1_price*(1+btc_cny_slippage)*(1+ltc_btc_slippage) 
+                    /[(1-btc_cny_fee)*(1-ltc_btc_fee)*(1-ltc_cny_fee)*(1-ltc_cny_slippage)]
+                    考虑到各市场费率都在千分之几的水平，做精度取舍后，该不等式可以进一步化简成：
+                    (ltc_cny_buy_1_price/btc_cny_sell_1_price-ltc_btc_sell_1_price)/ltc_btc_sell_1_price
+                    >btc_cny_slippage+ltc_btc_slippage+ltc_cny_slippage+btc_cny_fee+ltc_cny_fee+ltc_btc_fee
+                    基本意思就是：只有当公允价和市场价的价差比例大于所有市场的费率总和再加上滑点总和时，做三角套利才是盈利的。
+                '''
+                logger.info("base_cur：{0},正循环差价：{1},滑点+手续费:{2}".format(self.base_cur,
+                    (base_mid_price_buy_1 / quote_mid_price_sell_1 - market_price_sell_1)/market_price_sell_1,
+                    self.sum_slippage_fee())
+                      )
+                logger.info("base_cur：{0},逆循环差价：{1},滑点+手续费:{2}".format(self.base_cur,
+                      (market_price_buy_1 - base_mid_price_sell_1 / quote_mid_price_buy_1)/market_price_buy_1,
+                       self.sum_slippage_fee())
+                      )
 
-            # 检查正循环套利
-            '''
-                三角套利的基本思路是，用两个市场（比如BTC/CNY，LTC/CNY）的价格（分别记为P1，P2），
-                计算出一个公允的LTC/BTC价格（P2/P1），如果该公允价格跟实际的LTC/BTC市场价格（记为P3）不一致，
-                就产生了套利机会
-                
-                对应的套利条件就是：
-                ltc_cny_buy_1_price >
-                btc_cny_sell_1_price*ltc_btc_sell_1_price*(1+btc_cny_slippage)*(1+ltc_btc_slippage) 
-                /[(1-btc_cny_fee)*(1-ltc_btc_fee)*(1-ltc_cny_fee)*(1-ltc_cny_slippage)]
-                考虑到各市场费率都在千分之几的水平，做精度取舍后，该不等式可以进一步化简成：
-                (ltc_cny_buy_1_price/btc_cny_sell_1_price-ltc_btc_sell_1_price)/ltc_btc_sell_1_price
-                >btc_cny_slippage+ltc_btc_slippage+ltc_cny_slippage+btc_cny_fee+ltc_cny_fee+ltc_btc_fee
-                基本意思就是：只有当公允价和市场价的价差比例大于所有市场的费率总和再加上滑点总和时，做三角套利才是盈利的。
-            '''
-            logger.info("正循环差价：{0},滑点+手续费:{1}".format(
-                (base_mid_price_buy_1 / quote_mid_price_sell_1 - market_price_sell_1)/market_price_sell_1,
-                self.sum_slippage_fee())
-                  )
-            logger.info("逆循环差价：{0},滑点+手续费:{1}".format(
-                  (market_price_buy_1 - base_mid_price_sell_1 / quote_mid_price_buy_1)/market_price_buy_1,
-                   self.sum_slippage_fee())
-                  )
+                # 检查正循环套利
+                if (base_mid_price_buy_1 / quote_mid_price_sell_1 - market_price_sell_1)/market_price_sell_1 > self.sum_slippage_fee():
+                    market_buy_size = self.get_market_buy_size(huobi_market)
+                    market_buy_size = downRound(market_buy_size, 2)
+                    if market_buy_size >= self.min_trade_unit:
+                        self.pos_cycle(huobi_market, market_buy_size)
+                    else:
+                        logger.info("小于最小交易单位")
 
-            # 检查正循环套利
-            if (base_mid_price_buy_1 / quote_mid_price_sell_1 - market_price_sell_1)/market_price_sell_1 > self.sum_slippage_fee():
-                market_buy_size = self.get_market_buy_size(huobi_market)
-                market_buy_size = downRound(market_buy_size, 2)
-                if market_buy_size >= self.min_trade_unit:
-                    self.pos_cycle(huobi_market, market_buy_size)
-                else:
-                    logger.info("小于最小交易单位")
-
-            # 检查逆循环套利
-            elif (market_price_buy_1 - base_mid_price_sell_1 / quote_mid_price_buy_1)/market_price_buy_1 > self.sum_slippage_fee():
-                market_sell_size = self.get_market_sell_size(huobi_market)
-                market_sell_size = downRound(market_sell_size, 2)
-                if market_sell_size >= self.min_trade_unit:
-                    self.neg_cycle(huobi_market, market_sell_size)
-                else:
-                    logger.info("小于最小交易单位")
+                # 检查逆循环套利
+                elif (market_price_buy_1 - base_mid_price_sell_1 / quote_mid_price_buy_1)/market_price_buy_1 > self.sum_slippage_fee():
+                    market_sell_size = self.get_market_sell_size(huobi_market)
+                    market_sell_size = downRound(market_sell_size, 2)
+                    if market_sell_size >= self.min_trade_unit:
+                        self.neg_cycle(huobi_market, market_sell_size)
+                    else:
+                        logger.info("小于最小交易单位")
         except Exception as e:
             exstr = traceback.format_exc()
             print(exstr)

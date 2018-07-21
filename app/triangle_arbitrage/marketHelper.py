@@ -20,30 +20,31 @@ class Market:
         :return:
         """
         if self.market_name == "huobi":
-            if quote_cur == "usdt":
-                if base_cur == "eth":
-                    return bitexService.BitexServiceAPIKey().get_depth("ethusdt","step0").get("tick")
-                elif base_cur == "etc":
-                    return bitexService.BitexServiceAPIKey().get_depth("etcusdt", "step0").get("tick")
-                elif base_cur == "btc":
-                    return proService.ProServiceAPIKey().get_depth("btcusdt").get("tick")
-                    # return huobiService.getDepth(uh.HUOBI_COIN_TYPE_BTC, quote_cur)
-                elif base_cur == "ltc":
-                    return proService.ProServiceAPIKey().get_depth("ltcusdt").get("tick")
-                    # return huobiService.getDepth(uh.HUOBI_COIN_TYPE_LTC, quote_cur)
-                else:
-                    return None
-            elif quote_cur == "btc":
-                if base_cur == "eth":
-                    return proService.ProServiceAPIKey().get_depth("ethbtc").get("tick")
-                elif base_cur == "etc":
-                    return proService.ProServiceAPIKey().get_depth("etcbtc").get("tick")
-                elif base_cur == "ltc":
-                    return proService.ProServiceAPIKey().get_depth("ltcbtc").get("tick")
-                elif base_cur == "cny":
-                    return huobiService.getDepth(uh.HUOBI_COIN_TYPE_BTC, "cny")
-            else:
-                return None
+            # if quote_cur == "usdt":
+            #     if base_cur == "eth":
+            #         return bitexService.BitexServiceAPIKey().get_depth("ethusdt","step0").get("tick")
+            #     elif base_cur == "etc":
+            #         return bitexService.BitexServiceAPIKey().get_depth("etcusdt", "step0").get("tick")
+            #     elif base_cur == "btc":
+            #         return proService.ProServiceAPIKey().get_depth("btcusdt").get("tick")
+            #         # return huobiService.getDepth(uh.HUOBI_COIN_TYPE_BTC, quote_cur)
+            #     elif base_cur == "ltc":
+            #         return proService.ProServiceAPIKey().get_depth("ltcusdt").get("tick")
+            #         # return huobiService.getDepth(uh.HUOBI_COIN_TYPE_LTC, quote_cur)
+            #     else:
+            #         return None
+            # elif quote_cur == "btc":
+            #     if base_cur == "eth":
+            #         return proService.ProServiceAPIKey().get_depth("ethbtc").get("tick")
+            #     elif base_cur == "etc":
+            #         return proService.ProServiceAPIKey().get_depth("etcbtc").get("tick")
+            #     elif base_cur == "ltc":
+            #         return proService.ProServiceAPIKey().get_depth("ltcbtc").get("tick")
+            #     elif base_cur == "cny":
+            #         return huobiService.getDepth(uh.HUOBI_COIN_TYPE_BTC, "cny")
+            # else:
+            #     return None
+            return proService.ProServiceAPIKey().get_depth(base_cur + quote_cur).get("tick")
         else:
             return None
 
