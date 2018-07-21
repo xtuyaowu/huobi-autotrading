@@ -119,6 +119,8 @@ class Triangle:
                   (market_price_buy_1 - base_mid_price_sell_1 / quote_mid_price_buy_1)/market_price_buy_1,
                    self.sum_slippage_fee())
                   )
+            
+            # 检查正循环套利
             if (base_mid_price_buy_1 / quote_mid_price_sell_1 - market_price_sell_1)/market_price_sell_1 > self.sum_slippage_fee():
                 market_buy_size = self.get_market_buy_size(huobi_market)
                 market_buy_size = downRound(market_buy_size, 2)
@@ -128,7 +130,6 @@ class Triangle:
                     logger.info("小于最小交易单位")
 
             # 检查逆循环套利
-
             elif (market_price_buy_1 - base_mid_price_sell_1 / quote_mid_price_buy_1)/market_price_buy_1 > self.sum_slippage_fee():
                 market_sell_size = self.get_market_sell_size(huobi_market)
                 market_sell_size = downRound(market_sell_size, 2)
