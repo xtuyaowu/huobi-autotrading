@@ -20,15 +20,17 @@ class Market:
         :return:
         """
         if self.market_name == "huobi":
-            if quote_cur == "cny":
+            if quote_cur == "usdt":
                 if base_cur == "eth":
-                    return bitexService.BitexServiceAPIKey().get_depth("ethcny","step0").get("tick")
+                    return bitexService.BitexServiceAPIKey().get_depth("ethusdt","step0").get("tick")
                 elif base_cur == "etc":
-                    return bitexService.BitexServiceAPIKey().get_depth("etccny", "step0").get("tick")
+                    return bitexService.BitexServiceAPIKey().get_depth("etcusdt", "step0").get("tick")
                 elif base_cur == "btc":
-                    return huobiService.getDepth(uh.HUOBI_COIN_TYPE_BTC, quote_cur)
+                    return proService.ProServiceAPIKey().get_depth("btcusdt").get("tick")
+                    # return huobiService.getDepth(uh.HUOBI_COIN_TYPE_BTC, quote_cur)
                 elif base_cur == "ltc":
-                    return huobiService.getDepth(uh.HUOBI_COIN_TYPE_LTC, quote_cur)
+                    return proService.ProServiceAPIKey().get_depth("ltcusdt").get("tick")
+                    # return huobiService.getDepth(uh.HUOBI_COIN_TYPE_LTC, quote_cur)
                 else:
                     return None
             elif quote_cur == "btc":

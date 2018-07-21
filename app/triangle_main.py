@@ -32,7 +32,7 @@ class Triangle:
         可以获得多少单位的quote currency（比如BTC）。
         当LTC对BTC的价格上涨时，同等单位的LTC能够兑换的BTC是增加的，而同等单位的BTC能够兑换的LTC是减少的。
     """
-    def __init__(self, base_cur="ltc", quote_cur="btc", mid_cur="cny", interval=10):
+    def __init__(self, base_cur="ltc", quote_cur="btc", mid_cur="usdt", interval=10):
         """
         初始化
         :param base_cur:  基准资产
@@ -119,7 +119,7 @@ class Triangle:
                   (market_price_buy_1 - base_mid_price_sell_1 / quote_mid_price_buy_1)/market_price_buy_1,
                    self.sum_slippage_fee())
                   )
-            
+
             # 检查正循环套利
             if (base_mid_price_buy_1 / quote_mid_price_sell_1 - market_price_sell_1)/market_price_sell_1 > self.sum_slippage_fee():
                 market_buy_size = self.get_market_buy_size(huobi_market)
