@@ -92,7 +92,7 @@ ORIGINAL_WEALTH = None
 DATABASE_RECORD = True
 
 # 配置以下项目以初始化数据库
-DATABASE_SERVER_ADDRESS = "127.0.0.1"
+DATABASE_SERVER_ADDRESS = "118.122.185.14"
 DATABASE_SERVER_PORT = 27017
 DATABASE_NAME = "huobi_exchange"
 
@@ -108,3 +108,7 @@ DATABASE_SERVER_PASSWORD = None
 MAIL_ACCOUNT = None
 MAIL_AUTH_CODE = None
 MAIL_RECEIPIENTS = []
+
+proxies_ip = "10.8.42.143"
+proxies_port = 1080
+proxies = {"http": "http://10.8.42.143:1080", "https": "http://10.8.42.143:1080", }

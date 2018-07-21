@@ -11,10 +11,9 @@ import urllib.request
 import requests
 import time
 
-import accountConfig
-
-
 # MARKET_URL = "http://dawn-notification-peer-pro.dev-21.huobiapps.com"
+from app.settings import proxies
+
 MARKET_URL = "http://api.huobi.pro"
 # BROKER_URL = "http://dawn-broker-pro.dev-21.huobiapps.com"
 BROKER_URL = "http://api.huobi.pro"
@@ -27,7 +26,6 @@ def http_get_request(url, params, add_to_headers=None):
     if add_to_headers:
         headers.update(add_to_headers)
     postdata = urllib.parse.urlencode(params)
-    proxies = {"http": "http://10.8.42.143:1080", "https": "http://10.8.42.143:1080", }
     response = requests.get(url, postdata, headers=headers, proxies=proxies, timeout=10)
     time.sleep(0.2)
     if response.status_code == 200:

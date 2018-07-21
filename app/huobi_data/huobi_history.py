@@ -7,6 +7,8 @@ import json
 import csv
 import pymysql
 
+from app.settings import proxies_ip, proxies_port
+
 global globalTime
 # 获取历史数据起始时间
 globalTime = 1526392680
@@ -87,7 +89,7 @@ x = globalTime
 if __name__ == '__main__':
     while (1):
         try:
-            ws = create_connection("wss://api.huobi.pro/ws", http_proxy_host="10.8.42.143", http_proxy_port=1080)
+            ws = create_connection("wss://api.huobi.pro/ws", http_proxy_host=proxies_ip, http_proxy_port=proxies_port)
             # ws = create_connection("wss://api.huobipro.com/ws")
 
             while (1):

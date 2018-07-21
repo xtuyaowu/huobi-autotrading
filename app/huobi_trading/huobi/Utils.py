@@ -18,6 +18,7 @@ from ecdsa import SigningKey
 from hashlib import sha256
 
 # 此处填写APIKEY
+from app.settings import proxies
 
 ACCESS_KEY = ""
 SECRET_KEY = ""
@@ -46,7 +47,6 @@ def http_get_request(url, params, add_to_headers=None):
     if add_to_headers:
         headers.update(add_to_headers)
     postdata = urllib.parse.urlencode(params)
-    proxies = {"http": "http://10.8.42.143:1080", "https": "http://10.8.42.143:1080", }
     response = requests.get(url, postdata, headers=headers, timeout=5, proxies=proxies)
     try:
 

@@ -9,6 +9,8 @@ import logging
 
 import websocket
 
+from app.settings import proxies_ip, proxies_port
+
 logger = logging.getLogger(__name__)
 
 
@@ -104,4 +106,4 @@ def start():
         on_error=on_error,
         on_close=on_close
     )
-    ws.run_forever(http_proxy_host='10.8.42.143', http_proxy_port= 1080)
+    ws.run_forever(http_proxy_host = proxies_ip, http_proxy_port= proxies_port)

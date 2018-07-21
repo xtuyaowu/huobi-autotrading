@@ -9,9 +9,10 @@ import urllib.request
 
 import requests
 
-import app.triangle_arbitrage.accountConfig
-
 # 在此输入您的Key
+from app.settings import proxies
+from app.triangle_arbitrage import accountConfig
+
 KEY_INDEX = "CNY_1"  # 默认的key_index
 
 ACCOUNT_INFO = "get_account_info"
@@ -88,7 +89,6 @@ def httpRequest(url, params):
 
     postdata = urllib.parse.urlencode(params)
     # postdata = postdata.encode('utf-8')
-    proxies = {"http": "http://10.8.42.143:1080", "https": "http://10.8.42.143:1080", }
     response = requests.post(url, postdata, headers=headers, proxies=proxies, timeout=5)
     time.sleep(0.2)
     if response.status_code == 200:

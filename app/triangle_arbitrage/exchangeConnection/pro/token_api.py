@@ -8,8 +8,6 @@ import urllib.request
 
 import requests
 
-import accountConfig
-
 BROKER_URL = 'http://be.huobi.com/v1/'
 MARKET_URL = 'http://be.huobi.com/market/'
 

@@ -24,8 +24,7 @@ class Market:
                 if base_cur == "eth":
                     return bitexService.BitexServiceAPIKey().get_depth("ethcny","step0").get("tick")
                 elif base_cur == "etc":
-                    return bitexService.BitexServiceAPIKey().get_depth("etccny", "step0").get(
-                        "tick")
+                    return bitexService.BitexServiceAPIKey().get_depth("etccny", "step0").get("tick")
                 elif base_cur == "btc":
                     return huobiService.getDepth(uh.HUOBI_COIN_TYPE_BTC, quote_cur)
                 elif base_cur == "ltc":
