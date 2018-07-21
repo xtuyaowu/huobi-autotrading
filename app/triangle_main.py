@@ -119,8 +119,7 @@ class Triangle:
                   (market_price_buy_1 - base_mid_price_sell_1 / quote_mid_price_buy_1)/market_price_buy_1,
                    self.sum_slippage_fee())
                   )
-            if (base_mid_price_buy_1 / quote_mid_price_sell_1 - market_price_sell_1)/market_price_sell_1 > \
-                    self.sum_slippage_fee():
+            if (base_mid_price_buy_1 / quote_mid_price_sell_1 - market_price_sell_1)/market_price_sell_1 > self.sum_slippage_fee():
                 market_buy_size = self.get_market_buy_size(huobi_market)
                 market_buy_size = downRound(market_buy_size, 2)
                 if market_buy_size >= self.min_trade_unit:
@@ -130,8 +129,7 @@ class Triangle:
 
             # 检查逆循环套利
 
-            elif (market_price_buy_1 - base_mid_price_sell_1 / quote_mid_price_buy_1)/market_price_buy_1 > \
-                    self.sum_slippage_fee():
+            elif (market_price_buy_1 - base_mid_price_sell_1 / quote_mid_price_buy_1)/market_price_buy_1 > self.sum_slippage_fee():
                 market_sell_size = self.get_market_sell_size(huobi_market)
                 market_sell_size = downRound(market_sell_size, 2)
                 if market_sell_size >= self.min_trade_unit:
@@ -144,8 +142,7 @@ class Triangle:
             logger.error(traceback.format_exc())
 
     def sum_slippage_fee(self):
-        return self.base_quote_slippage + self.base_mid_slippage + self.quote_mid_slippage + \
-               self.base_quote_fee + self.base_mid_fee + self.quote_mid_fee
+        return self.base_quote_slippage + self.base_mid_slippage + self.quote_mid_slippage + self.base_quote_fee + self.base_mid_fee + self.quote_mid_fee
 
     @staticmethod
     def get_market_name(base, quote):
